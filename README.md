@@ -42,22 +42,27 @@ So, what kind of high score can you get?
 ![](https://github.com/Bofner/Space-Tonbow/blob/main/images/highScore.gif)
  
  
+__________________________________________________________________________________________________
+
+ 
 This repository includes all source code and assets for this project. All code and art by me, Cameron "Bofner" Mitchell. 
  
-Tools used:
+## Tools used:
  
-Emulator for testing:
+### Emulator for testing:
 
 -Emulicious by Calindro
  
-Artwork/Assets:
+### Artwork/Assets:
 
 -Aseprite by Igara Studio S.A.
+
 -BMP2Tile by Maxim
  
-Programming and Assembly:
+### Programming and Assembly:
 
 -Visual Studio Code by Microsoft
+
 -WLA DX by Ville Helin
  
 Thanks to everyone who made these wonderful tools!
