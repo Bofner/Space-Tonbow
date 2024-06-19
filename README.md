@@ -49,9 +49,11 @@ This repository includes all source code and assets for this project. All code a
  
 ## Tools used:
  
-### Emulator for testing:
+### Emulators for testing:
 
--Emulicious by Calindro
+-Emulicious by Calindro for general purpose testing
+
+-BizHawk by TASVideos for LUA scripting 
  
 ### Artwork/Assets:
 
