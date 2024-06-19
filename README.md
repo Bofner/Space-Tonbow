@@ -1,6 +1,6 @@
 # Space Tonbow
 
-![](https://github.com/Bofner/Space-Tonbow/blob/main/images/title.gif)
+![](https://github.com/Bofner/Space-Tonbow/blob/main/images/tite.gif)
 
 Soar through outerspace as the giant mechanical dragonfly, Tonbow, taking out enemy orbs swarming the stars
 in this arcade-style Sega Master System game!
