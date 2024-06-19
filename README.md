@@ -79,8 +79,11 @@ ________________________________________________________________________________
 Space Tonbow is almost near completion! Feel free to call this the beta.
 
 Hoping to add:
+
 -Sound effects
+
 -???
 
 Hoping to fix:
+
 -A bug where if you die on the bottom of screen, no parts go flying
