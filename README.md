@@ -47,13 +47,16 @@ This repository includes all source code and assets for this project. All code a
 Tools used:
  
 Emulator for testing:
+
 -Emulicious by Calindro
  
 Artwork/Assets:
+
 -Aseprite by Igara Studio S.A.
 -BMP2Tile by Maxim
  
 Programming and Assembly:
+
 -Visual Studio Code by Microsoft
 -WLA DX by Ville Helin
  
