@@ -808,6 +808,16 @@ TonbowDead:
     ld hl, tonbow.hurtBox.width
     ld (hl), 0
 
+;Work in the Audio Bank
+    ld a, Audio
+    ld ($FFFF), a
+    call PSGStop
+    ld hl, AkiGaHajimaruPSG
+    call PSGPlayNoRepeat
+;Switch to correct bank for Title Assets
+    ld a, DemoLevelBank
+    ld ($FFFF), a
+
 
 ;Reduce the number of enemies on screen to accomodate for the GAME OVER message
     ;ld hl, enemyList.enemyCountMax

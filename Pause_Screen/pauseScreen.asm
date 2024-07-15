@@ -13,6 +13,11 @@
 
 
 SetUpPause:
+;Cut the music
+    ld a, Audio
+    ld ($FFFF), a
+    call PSGStop
+    call PSGSFXStop
 ;Dim the screen
     call FadeToBlack
 

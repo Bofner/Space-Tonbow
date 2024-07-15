@@ -237,10 +237,20 @@ EnemyList:
     jp z, @TonbowCollisionCheck
 ;If collision detected, then kill Enemy and +1 score
     push hl
+    ;Score
         ld de, enemyStruct.state - enemyStruct.hitBox.width
         add hl, de
         ld (hl), $FF
         call PlusScore
+    ;Work in the Audio Bank
+        ld a, Audio
+        ld ($FFFF), a
+	    ld hl, ExplosionSFX
+	    ld c, SFX_CHANNEL3		;Channels 3
+	    call PSGSFXPlay
+    ;Switch to correct bank for Title Assets
+        ld a, DemoLevelBank
+        ld ($FFFF), a
     pop hl
     
     ret                                 ;Enemy dies, not Tonbow

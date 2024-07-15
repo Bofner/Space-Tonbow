@@ -12,6 +12,23 @@ SpawnOrbShot:
 ;Check if the Orb exploded at the end of the screen or if it was killed by Tonbow
 ; ^^This is done by only running this when it reaches the edge of the screen
 
+;Make our sound effect
+	push hl
+;Work in the Audio Bank
+	ld a, (tonbow.alive)
+	cp $00
+	jr z, +
+    ld a, Audio
+    ld ($FFFF), a
+	ld hl, DemoFireSFX
+	ld c, SFX_CHANNELS2AND3		;Channels 1 and 3
+	call PSGSFXPlay
+;Switch to correct bank for Title Assets
+    ld a, DemoLevelBank
+    ld ($FFFF), a
++:
+	pop hl
+
 ;Find out which number demoOrb just called the spawn and select
 	;ld hl, demoOrbStruct.state
 	push hl								;Save demoOrbStruct.state

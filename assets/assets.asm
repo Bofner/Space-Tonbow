@@ -8,6 +8,7 @@
 .define     TitleScreenYokoBank     $0004
 .define     TitleScreenTateBank     $0005
 .define     TonbowTilesBank         $0006
+.define     Audio                   $0007
 
 ;Data for an all black palette
 FadedPalette:
@@ -447,3 +448,16 @@ CursorTateTiles:
 CursorTateTilesEnd:
 
 
+;============================================================================================
+; Audio files
+;============================================================================================
+.bank Audio
+.org $0000
+SpaceWindPSG:
+    .incbin "..\\Audio\\music\\space_wind.bin"
+AkiGaHajimaruPSG:
+    .incbin "..\\Audio\\music\\aki_ga_hajimaru.bin"
+DemoFireSFX:
+    .incbin "..\\Audio\\sfx\\demo_fire.bin"
+ExplosionSFX:
+    .incbin "..\\Audio\\sfx\\explosion.bin"

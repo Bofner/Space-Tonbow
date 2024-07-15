@@ -349,6 +349,9 @@ DemoLevel:
 ReturnToDemoLevel                           ;Used to activate/reactivate the Demo Level
     halt
     call UpdateSAT                          ;Refresh our sprites
+;Switch to correct bank for Title Assets
+    ld a, DemoLevelBank
+    ld ($FFFF), a
 ;Check if TATE or YOKO
     ld a, (tateMode)
     bit 0, a
@@ -423,6 +426,16 @@ UpdatePauseSprites:
 
     call FadeIn
 
+;Begin Music
+;Work in the Audio Bank
+    ld a, Audio
+    ld ($FFFF), a
+    ld hl, SpaceWindPSG
+    call PSGPlay 
+;Switch to correct bank for Gameplay
+    ld a, DemoLevelBank
+    ld ($FFFF), a
+
 ;Set up HBlank sequence
     ld hl, FirstHBlank
     ld (nextHBlankStep), hl
@@ -447,6 +460,17 @@ DemoLoop:
 
 ;Update Sprites
     call UpdateSAT 
+
+;Work in the Audio Bank
+    ld a, Audio
+    ld ($FFFF), a
+    call PSGFrame
+    call PSGSFXFrame
+    
+    
+;Switch to correct bank for Title Assets
+    ld a, DemoLevelBank
+    ld ($FFFF), a
 
 ;Update Tonbow based on Player inputs, and VRAM
     call UpdateTonbow

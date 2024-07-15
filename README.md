@@ -57,15 +57,23 @@ This repository includes all source code and assets for this project. All code a
  
 ### Artwork/Assets:
 
--Aseprite by Igara Studio S.A.
+-Aseprite by Igara Studio S.A. for graphics design
 
--BMP2Tile by Maxim
+-BMP2Tile by Maxim for conversion to SMS format
+
+### Music Production:
+
+-Deflemask by Leonard Demartino
+
+-PSGTool by Calindro
  
 ### Programming and Assembly:
 
--Visual Studio Code by Microsoft
+-Visual Studio Code by Microsoft 
 
--WLA DX by Ville Helin
+-WLA DX Assembler by Ville Helin
+
+-PSGLib by sverx
  
 Thanks to everyone who made these wonderful tools!
 
@@ -75,6 +83,21 @@ to continue working on this project!
 __________________________________________________________________________________________________
  
 ## Updates:
+
+#### v0.96: 07/16/2024
+
+Wow! We're really getting there! Space Tonbow now has MUSIC AND SFX! I didn't think I'd be able to
+write muic, so I'm really really happy that I figured it all out!
+
+Hoping to add:
+
+-Maybe one more song
+
+-Splash Screen tune or SFX
+
+Hoping to fix:
+
+-A bug where if you die on the bottom of screen, no parts go flying... still
 
 #### v0.9: 6/18/2024
 

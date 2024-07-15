@@ -51,6 +51,10 @@ ButtonOne_GameOver:
 ;Reset level
 	ld hl, sceneComplete
 	ld (hl), $01
+;Cut the music
+    ld a, Audio
+    ld ($FFFF), a
+    call PSGStop
 ;Cut to black
     call FadeToBlack
 ;Disable interrupts
@@ -61,6 +65,10 @@ ButtonOne_GameOver:
 ButtonTwo_GameOver:
     ld hl, sceneComplete
 	ld (hl), $02
+;Cut the music
+    ld a, Audio
+    ld ($FFFF), a
+    call PSGStop
 ;Cut to black
     call FadeToBlack
 ;Disable interrupts 
