@@ -84,7 +84,13 @@ ________________________________________________________________________________
  
 ## Updates:
 
-#### v0.96: 07/16/2024
+#### v0.9.6.1: 07/16/2024
+Fixed a bug that was causing a jump to random memory, leading to odd glitches and the game not 
+running on real hardware. 
+
+Still hoping to add and fix the same things as prior update
+
+#### v0.9.6: 07/16/2024
 
 Wow! We're really getting there! Space Tonbow now has MUSIC AND SFX! I didn't think I'd be able to
 write muic, so I'm really really happy that I figured it all out!

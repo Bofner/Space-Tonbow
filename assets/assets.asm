@@ -453,6 +453,7 @@ CursorTateTilesEnd:
 ;============================================================================================
 .bank Audio
 .org $0000
+.include "..\\Audio\\PSGlib.asm"
 SpaceWindPSG:
     .incbin "..\\Audio\\music\\space_wind.bin"
 AkiGaHajimaruPSG:
