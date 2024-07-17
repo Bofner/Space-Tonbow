@@ -45,35 +45,35 @@ So, what kind of high score can you get?
 __________________________________________________________________________________________________
 
  
-This repository includes all source code and assets for this project. All code and art by me, Cameron "Bofner" Mitchell. 
+This repository includes all source code and assets for this project. All code, art and music by me, Cameron "Bofner" Mitchell unless otherwise noted. 
  
 ## Tools used:
  
 ### Emulators for testing:
 
--Emulicious by Calindro for general purpose testing
+-[Emulicious](https://emulicious.net/) by Calindro for general purpose testing
 
--BizHawk by TASVideos for LUA scripting 
+-[BizHawk](https://tasvideos.org/Bizhawk) by TASVideos for LUA scripting 
  
 ### Artwork/Assets:
 
--Aseprite by Igara Studio S.A. for graphics design
+-[Aseprite](https://www.aseprite.org/) by Igara Studio S.A. for graphics design
 
--BMP2Tile by Maxim for conversion to SMS format
+-[BMP2Tile](https://github.com/maxim-zhao/bmp2tile) by Maxim for conversion to SMS format
 
 ### Music Production:
 
--Deflemask by Leonard Demartino
+-[Deflemask](https://www.deflemask.com/) by Leonard Demartino
 
--PSGTool by Calindro
+-[PSGTool](https://www.smspower.org/forums/16925-PSGToolAVGMToPSGConvertor) by Calindro
  
 ### Programming and Assembly:
 
--Visual Studio Code by Microsoft 
+-[Visual Studio Code](https://code.visualstudio.com/) by Microsoft 
 
--WLA DX Assembler by Ville Helin
+-[WLA DX Assembler](https://github.com/vhelin/wla-dx) by Ville Helin
 
--PSGLib by sverx
+-[PSGLib](https://github.com/sverx/PSGlib) by sverx 
  
 Thanks to everyone who made these wonderful tools!
 
