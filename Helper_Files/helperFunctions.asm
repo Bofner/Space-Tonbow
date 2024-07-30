@@ -754,8 +754,8 @@ InnerBlackLoop:                         ;LOOP
     ld (VDPStatus), a           
     halt                                
     ld a, (VDPStatus)             ;Check if we are at VBlank
-    or a
-    jp p, -                       ;If P, then bit 7 = 0, so HBLANK
+    bit 7, a
+    jp z, -                       ;If bit 7 = 0, the HBLANK so wait
     djnz -
 ;Reset VDP Status
     xor a
@@ -894,8 +894,8 @@ InnerInLoop:                                      ;LOOP
     ld (VDPStatus), a           
     halt                                
     ld a, (VDPStatus)             ;Check if we are at VBlank
-    or a
-    jp p, -                       ;If P, then bit 7 = 0, so HBLANK
+    bit 7, a
+    jp z, -                       ;If bit 7 = 0, the HBLANK so wait
     djnz -
 ;Reset VDP Status
     xor a

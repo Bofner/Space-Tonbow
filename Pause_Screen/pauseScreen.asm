@@ -16,8 +16,19 @@ SetUpPause:
 ;Cut the music
     ld a, Audio
     ld ($FFFF), a
+;Check for FM
+    ld a, (playFM)
+    cp $01
+    jr z, +
     call PSGStop
     call PSGSFXStop
+    jr ++
++:
+    call MBMStop
+    call MBMSFXStop
+++:
+    ld a, (currentBank)
+    ld ($FFFF), a
 ;Dim the screen
     call FadeToBlack
 

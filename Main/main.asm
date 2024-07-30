@@ -47,12 +47,18 @@
 .define LeftBounds          $09
 .define RightBounds         $E8
 
+.define BankSwitch          $FFFF
+.define sramSwitch          $FFFC
+.define highScoreCart       $8000
+.define highScoreOffset     HeaderForSRAMEnd-HeaderForSRAM + highScoreCart
+.define highScoreDataLength $000C   ;Score, score graphics and name
+
 
 ;==============================================================
 ; SDSC tag and ROM header
 ;==============================================================
 
-.sdsctag 0.7, "SPACE TONBOW DEMO", "A TATE/YOKO Experiment","Bofner"
+.sdsctag 1.0, "SPACE TONBOW", "A TATE/YOKO Experiment","Bofner"
 
 .bank 1 slot 1
 .org $0000
@@ -68,6 +74,13 @@
     di              ;Disable interrupts
     im 1            ;Interrupt mode 1
     jp init         ;Jump to the initialization program
+
+;==============================================================
+; SRAM Header file
+;==============================================================
+HeaderForSRAM:
+.incbin "..\\SRAM\\save_header.bin"
+HeaderForSRAMEnd:
 
 ;==============================================================
 ; Interrupt Handler
@@ -169,12 +182,17 @@ PauseJumpTable:
 
     frameFinish     db          ;$00 = Not finished, $01 = Writing finished, $11 = VBlank and writing finished
 
+    currentBank     db          ;Save the current bank
 
     VDPStatus       db          ;Holds VDP Status from the interrupt
                                 ;Bit 7:     1 = VBlank
                                 ;Bit 6:     1 = >=9 sprites on raster
                                 ;Bit 5:     1 = Sprite collision
                                 ;Bit 4-0:   No function
+
+    playFM          db          ;Do we have FM unit?
+    onFM            db          ;Are we currently using it?
+
     nextHBlankStep  dw          ;Variable that tells where to go for next HBlank
 
     DCInput         db          ;$DC input
@@ -216,6 +234,8 @@ PauseJumpTable:
     sceneID         db          ;Used to determine the scene we are on ($00 = SFS, $02 = Title, $01 = Pause, etc.)         
     pauseSceneID    db          ;The scene ID of the screen we were just coming from
     tateMode        db          ;$00 = YOKO, $01 = TATE
+
+    highScoreSMS    dw          ;Local High score
 
     pauseCursor instanceof cursorStruct         ;Located here so we don't overwite other sprites
     
@@ -267,12 +287,46 @@ PauseJumpTable:
 init: 
     ld sp, $DFF0
 
+;This code is from Phantasy Star
+FMDetection:
+    ld a,($c000)
+    or $04             ; Disable I/O chip
+    out ($3E),a
+    ld bc, $0700        ; Counter (7 -> b), plus 0 -> c
+-:  ld a,b
+    and %00000001      ; Mask to bit 0 only
+    out ($f2),a        ; Output to the audio control port
+    ld e,a
+    in a,($f2)         ; Read back
+    and %00000111      ; Mask to bits 0-2 only
+    cp e               ; Check low 3 bits are the same as what was written
+    jr nz,+
+    inc c              ; c = # of times the test was passed
++:  djnz -
+    ld a,c
+    cp 7               ; Check test was passed 7 times out of 7
+    jr z,+
+    xor a              ; If not, result is 0
++:  and 1              ; If so, result is 1
+    ld (playFM), a     ; Store result in C
+    xor a          ;Keep PSG Enabled even if we have FM
+    ld hl, onFM
+    ld (hl), a
+    out ($f2),a        ;So we load $00 instead of $01
+    ld a,($c000)
+    out ($3e),a        ; Turn I/O chip back on
+
 ;==============================================================
-; Initialize RAM to zero
+; Initialize RAM to zero and set up some variables
 ;==============================================================
 
     ld bc, $DFFF - $C000            ;Size of entire RAM space for variables
     ld hl, $C000                    ;Beginning point of RAM
+;Save our FM detector variables
+    ld a, (playFM)
+    ld d, a
+    ld a, (onFM)
+    ld e, a
 -:
 ;Initialize RAM to zero
     xor a
@@ -284,6 +338,71 @@ init:
     or c
     jr nz, -
 
+;Return our FM Detector variables
+    ld a, d
+    ld (playFM), a
+    ld a, e
+    ld (onFM), a
+
+;==============================================================
+; Initialize SRAM (if it needs to be initialized)
+;==============================================================
+;Check for our header
+;SRAM Select Register
+    ld a, %00001000
+    ld (sramSwitch), a
+;Load our registers with our data and counters
+    ld b, HeaderForSRAMEnd-HeaderForSRAM
+    ld hl, HeaderForSRAM
+    ld de, highScoreCart
+;Go through each value to check if the header holds the proper value
+-:
+    ld a, (de)
+    ld c, (hl)
+    inc hl              ;\ Increment our bytes for HL and DE
+    inc de              ;/
+    cp c
+    jr nz, InitSRAM     ;If not proper, then initialize VRAM
+
+    djnz -
+OkaySRAM:
+    jr +
+;Initialize our SRAM
+InitSRAM:
+    ld b, HeaderForSRAMEnd-HeaderForSRAM
+    ld hl, highScoreCart
+    ld de, HeaderForSRAM
+-:
+;Transfer data
+    ld a, (de)
+    ld (hl), a
+;Increment
+    inc hl
+    inc de
+;Repeat for header length
+    djnz -
+;Once more to wipe the top score data
+    ld b, highScoreDataLength
+-:
+    xor a
+    ld (hl), a
+    inc hl
+
+    djnz -
+
++:
+;Set our High Score
+    ld hl, highScoreOffset        ;10s and 1 digit
+    ld a, (hl)
+    ld hl, highScoreSMS
+    ld (hl), a
+    ld hl, highScoreOffset + 1    ;100s digit
+    ld a, (hl)
+    ld hl, highScoreSMS+ 1
+    ld (hl), a
+;Switch out from SRAM
+    ld a, %00000000
+    ld (sramSwitch), a
 ;==============================================================
 ; Set up VDP Registers
 ;==============================================================
@@ -293,9 +412,6 @@ init:
     ld c, $80                               ; VDP register command byte.
     call SetVDPRegisters
 
-;RAM Select Register
-    ld a, %00000000
-    ld ($FFFC), a
 ;Set up banks
     ld a, $00
     ld ($FFFD), a
@@ -329,19 +445,22 @@ init:
 
 
 ;==============================================================
-; Enable Interrupts
-;==============================================================
-
-    ei
-
-;==============================================================
-; Set up PSGlib
+; Set up PSGlib and MBPlay
 ;==============================================================
     ld a, Audio
     ld ($FFFF), a
     call PSGInit 
+    ld hl, MBMBank
+    ld (hl), Audio
     ld a, SFSBank
     ld ($FFFF), a 
+
+;==============================================================
+; Enable Interrupts
+;==============================================================
+
+    ;ei
+
 
 BeginSpaceTonbow:
 
@@ -383,6 +502,13 @@ BeginSpaceTonbow:
 .include "..\\Helper_Files\\interruptHandler.asm"
 .include "..\\Object_Files\\enemyList.asm"
 
+;Couldn't neatly fit them in the audio bank, so here they are
+DangerousPlanetPSG:
+    .incbin "..\\Audio\\music\\approaching_a_dangerous_planet.bin"
+    
+DangerousPlanetFM:
+    .incbin "..\\Audio\\music\\approaching_a_dangerous_planet_FM.bin"
+
 ;==============================================================
 ; Include Game Mechanic Files
 ;==============================================================
@@ -398,6 +524,8 @@ BeginSpaceTonbow:
 ; Include Level Files
 ;==============================================================
 .include "..\\Splash_Screen\\steelFingerStudios.asm"
+.include "..\\Title_Screen\\titleScreen.asm"
+.include "..\\Title_Screen\\titleControl.asm"
 .include "..\\Demo_Level\\demoLevel.asm"
 .include "..\\Demo_Level\\demoSetup.asm"
 .include "..\\Demo_Level\\demoUpdate.asm"
@@ -405,8 +533,8 @@ BeginSpaceTonbow:
 .include "..\\Demo_Level\\gameOverControl.asm"
 .include "..\\Pause_Screen\\pauseScreen.asm"
 .include "..\\Pause_Screen\\pauseSetup.asm"
-.include "..\\Title_Screen\\titleControl.asm"
-.include "..\\Title_Screen\\titleScreen.asm"
+
+
 
 ;==============================================================
 ; Assets

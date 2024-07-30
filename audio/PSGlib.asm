@@ -31,7 +31,6 @@
 .define      SFX_CHANNELS2AND3   SFX_CHANNEL2|SFX_CHANNEL3
 .define      SFX_CHANNEL0        $04
 .define      SFX_CHANNEL1        $08
-.define      SFX_CHANNEL1AND3    SFX_CHANNEL1|SFX_CHANNEL3
 
 .section "PSGInit" free
 ; ************************************************************************************
@@ -1144,4 +1143,5 @@ _SFXsubstring:
   PSGSFXSubstringLen         db       ; lenght of the substring we are playing
   PSGSFXSubstringRetAddr     dw       ; return to this address when substring is over
 ;.ends
+  PSGEndSection              db
 .ende                    ; in case you want to use .enum instead of .ramsection

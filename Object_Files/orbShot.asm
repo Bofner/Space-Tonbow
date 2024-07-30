@@ -17,16 +17,34 @@ SpawnOrbShot:
 ;Work in the Audio Bank
 	ld a, (tonbow.alive)
 	cp $00
-	jr z, +
+	jr z, +++
     ld a, Audio
     ld ($FFFF), a
-	ld hl, DemoFireSFX
-	ld c, SFX_CHANNELS2AND3		;Channels 1 and 3
+;Check for FM
+    ld a, (playFM)
+    cp $01
+    jr z, +
+    ld hl, DemoFireSFX
+	ld c, SFX_CHANNELS2AND3		;Channel 2 and 3
 	call PSGSFXPlay
+    jr ++
+;Play FM SFX
++:
+	ld hl, MBMSFXBank
+	ld (hl), Audio
+	ld hl, MBMSFXStart
+    ld de, DemoFireSFXFM
+	ld a, e
+    ld (hl), a
+    ld a, d
+    inc hl
+    ld (hl), a
+    call MBMSFXPlay 
+++:	
 ;Switch to correct bank for Title Assets
     ld a, DemoLevelBank
     ld ($FFFF), a
-+:
++++:
 	pop hl
 
 ;Find out which number demoOrb just called the spawn and select

@@ -47,28 +47,62 @@ ButtonOne_GameOver:
 	ld hl, gameOverCursorSprite.state
 	ld a, (hl)
 	cp $01
-	jr z, +					;If not, then move to title screen
+	jr z, +++					;If not, then move to title screen
 ;Reset level
 	ld hl, sceneComplete
 	ld (hl), $01
 ;Cut the music
     ld a, Audio
     ld ($FFFF), a
+;Check for FM
+    ld a, (playFM)
+    cp $01
+    jr z, +
     call PSGStop
+    call PSGSFXStop
+    jr ++
++:
+    call MBMStop
+++:
+;Switch to correct bank for Title Assets
+    ld a, (currentBank)
+    ld ($FFFF), a   
 ;Cut to black
     call FadeToBlack
 ;Disable interrupts
     di
+;Set up interrupts for the reset
+    ld hl, FirstHBlank
+    ld (nextHBlankStep), hl         ;Prepare the step for the next HBLANK
 ;Demo Level will handle resetting itself
 	ret
-+:
++++:
 ButtonTwo_GameOver:
     ld hl, sceneComplete
 	ld (hl), $02
 ;Cut the music
     ld a, Audio
     ld ($FFFF), a
+;Check for FM
+    ld a, (playFM)
+    cp $01
+    jr z, +
+-:
+;Check if we actually want to use FM
+    ld a, (onFM)
+    cp $01
+    jr nz, +
     call PSGStop
+    jr ++
++:
+    call MBMStop
+++:
+    ld a, $00          ;Keep PSG Enabled even if we have FM
+    out ($f2),a        ;So we load $00 instead of $01
+    call PSGStop       ;Turns off any left over noise
+;Switch to correct bank for Title Assets
+    ld a, (currentBank)
+    ld ($FFFF), a    
 ;Cut to black
     call FadeToBlack
 ;Disable interrupts 

@@ -20,6 +20,9 @@ DemoLevel:
 ;Switch to correct bank for Title Assets
     ld a, DemoLevelBank
     ld ($FFFF), a
+    ld hl, currentBank
+    ld (hl), a
+
 
 ;==============================================================
 ; Memory (Structures, Variables & Constants) 
@@ -53,6 +56,7 @@ DemoLevel:
     demoOrbB instanceof demoOrbStruct
     demoOrbSpeed        db              ;Speed at which the Demo Orbs move
     demoOrbSpawnTimer   db              ;Are we allowing a demoOrb to spawn now?
+    demoOrbSpawnPos     db              ;Where did the previous Demo Orb spawn in?
 
     orbShot0 instanceof enemyStruct
     orbShot1 instanceof enemyStruct
@@ -73,6 +77,9 @@ DemoLevel:
     againSprite          instanceof spriteStruct
     titleSprite          instanceof spriteStruct
     gameOverCursorSprite instanceof cursorStruct
+
+    newHighScore         instanceof spriteStruct
+    highScoreFlag       db
 
 
 .ende
@@ -104,6 +111,9 @@ DemoLevel:
     xor a
 
     ld (frameCount), a 
+
+    ld hl, highScoreFlag
+    ld (hl), a
 
     ld hl, demoOrbSpeed
     ld (hl), $0C                        ;Level 1 demoOrbSpeed
@@ -289,6 +299,13 @@ DemoLevel:
     ld hl, GameOverCursor
     ld bc, GameOverCursorEnd-GameOverCursor
     call CopyToVDP 
+
+;New High Score
+    ld hl, NEW_HIGH_SCORE_VRAM | VRAMWrite
+    call SetVDPAddress
+    ld hl, NewHighScoreYoko
+    ld bc, NewHighScoreYokoEnd-NewHighScoreYoko
+    call CopyToVDP 
     jr ++
 ;-----------------------------------------------------------------
 ;TATE
@@ -328,6 +345,13 @@ DemoLevel:
     ld bc, GameOverCursorTateEnd-GameOverCursorTate
     call CopyToVDP 
 
+;New High Score
+    ld hl, NEW_HIGH_SCORE_VRAM | VRAMWrite
+    call SetVDPAddress
+    ld hl, NewHighScoreTate
+    ld bc, NewHighScoreTateEnd-NewHighScoreTate
+    call CopyToVDP 
+
 ;==============================================================
 ; Set Registers for HBlank
 ;==============================================================
@@ -359,11 +383,23 @@ ReturnToDemoLevel                           ;Used to activate/reactivate the Dem
 ;YOKO
     ld hl, pauseCursor.yPos                 ;Move the arrow to exit
     ld (hl), $66
+;New High Score
+    ld hl, NEW_HIGH_SCORE_VRAM | VRAMWrite
+    call SetVDPAddress
+    ld hl, NewHighScoreYoko
+    ld bc, NewHighScoreYokoEnd-NewHighScoreYoko
+    call CopyToVDP 
     jr UpdatePauseSprites
 ;TATE
 PauseTateExit:
     ld hl, pauseCursor.xPos                 ;Move the arrow to exit
     ld (hl), $80
+    ;New High Score
+    ld hl, NEW_HIGH_SCORE_VRAM | VRAMWrite
+    call SetVDPAddress
+    ld hl, NewHighScoreTate
+    ld bc, NewHighScoreTateEnd-NewHighScoreTate
+    call CopyToVDP 
 
 UpdatePauseSprites:
     call UpdatePauseSpriteBuffer            ;Update all of the sprites on the screen
@@ -409,7 +445,18 @@ UpdatePauseSprites:
     ld c, $81
     call UpdateVDPRegister
 
+;Set up interrupts for the reset
     ei
+    halt
+;Prevent sprite scrambling if pause button is hit, and make sure we don't update VRAM if on HBLANK
+    ld a, (VDPStatus)             ;Check if we are at VBlank
+    or a
+    jp p, DemoLoop                  ;If on HBlank, don't execute this code
+
+    ld hl, FirstHBlank
+    ld (nextHBlankStep), hl         ;Prepare the step for the next HBLANK
+
+    
 
 ;========================================================
 ; Game Logic
@@ -430,15 +477,39 @@ UpdatePauseSprites:
 ;Work in the Audio Bank
     ld a, Audio
     ld ($FFFF), a
+;Check for FM
+    ld a, (playFM)
+    cp $01
+    jr z, +
+;PSG Space Wind
+    ;Turn FM off
+    ld hl, onFM
+    ld (hl), $00
+    ld a, $00
+    out ($f2),a
     ld hl, SpaceWindPSG
     call PSGPlay 
-;Switch to correct bank for Gameplay
-    ld a, DemoLevelBank
+    jr ++
+;FM Space Wind
++:
+;If we have it, we want to use FM
+    ld hl, onFM
+    ld (hl), $01
+;So turn it on
+    ld a, $01
+    out ($f2),a
+    ld hl, MBMStart
+    ld de, SpaceWindFM
+    ld a, e
+    ld (hl), a
+    ld a, d
+    inc hl
+    ld (hl), a
+    call MBMPlay
+;Switch to correct bank for Title Assets
+++:
+    ld a, (currentBank)
     ld ($FFFF), a
-
-;Set up HBlank sequence
-    ld hl, FirstHBlank
-    ld (nextHBlankStep), hl
 
 DemoLoop:
 ;Start LOOP
@@ -461,22 +532,12 @@ DemoLoop:
 ;Update Sprites
     call UpdateSAT 
 
-;Work in the Audio Bank
-    ld a, Audio
-    ld ($FFFF), a
-    call PSGFrame
-    call PSGSFXFrame
-    
-    
-;Switch to correct bank for Title Assets
-    ld a, DemoLevelBank
-    ld ($FFFF), a
-
-;Update Tonbow based on Player inputs, and VRAM
-    call UpdateTonbow
+;Update Tonow's sprite in VRAM
+    call UpdateTonbowGraphics
     
 ;Update DemoOrb palette
     call DemoOrbPaletteSwap         ;Done during VBlank so no particles drawn on screen
+
 ;--------------------
 ; Update Objects
 ;--------------------
@@ -494,14 +555,19 @@ DemoLoop:
     ;Hundreds
     ld hl, scoreHuns.sprNum
     call MultiUpdateSATBuff
-    jr ++
+    jr +++
 +:
 ;Update TATE Score
+    ld a, (frameCount)
+    bit 0, a
+    jr nz, ++
     call UpdateScoreGraphicsTate
+++:
     ld hl, scoreTATE.sprNum
     call MultiUpdateSATBuff
-++:
-
++++:
+;Update Tonbow based on Player inputs
+    call UpdateTonbow
     ld a, (tonbow.alive)            ;\
     cp $00                          ; } Check if Tonbow is Alive
     jr nz, +                        ;/
@@ -542,6 +608,13 @@ HandleGameOverCondition:
     call MultiUpdateSATBuff
     ld hl, titleSprite.sprNum
     call MultiUpdateSATBuff
+;Check if we got a high score
+    ld a, (highScoreFlag)
+    bit 0, a
+    jr z, NoHighScore
+    ld hl, newHighScore
+    call MultiUpdateSATBuff
+NoHighScore:
 ;Update Game Over Cursor
     call GameOverCursorCheck
     jr ++

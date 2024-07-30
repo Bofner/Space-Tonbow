@@ -83,6 +83,9 @@ FirstHBlank:
 VBlank:
 ;We are at VBlank
     push hl                         ;Preserve HL
+    push bc
+    push de
+
     ld hl, VDPStatus
     bit 7, a                        ;A = VDPStatus already
     jr z, +
@@ -98,6 +101,64 @@ ResetFrameCount:
 +:
     inc (hl)                        ;Otherwise, increase
 
+UpdateMusic:
+;Work in the Audio Bank
+    ld a, Audio
+    ld ($FFFF), a
+    ld a, (playFM)
+    cp $01
+    jr z, +
+-:
+    call PSGFrame
+    call PSGSFXFrame
+    jr ++
++:
+;Check if we actually want to use FM
+    ld a, (onFM)
+    cp $01
+    jr nz, -
+;Preserve ix and af'
+    exx
+    push hl
+    exx
+    ld a, ixh
+    ld h, a
+    ld a, ixl
+    ld l, a
+    push hl
+    ld a, iyh
+    ld h, a
+    ld a, iyl
+    ld l, a
+    ex af, af'
+    push af
+    push hl
+    call MBMFrame
+    ld a, (frameCount)
+    bit 0, a
+    jr z, +
+    call MBMSFXFrame
++:
+    pop hl
+    pop af
+    ex af, af'
+    ld a, l
+    ld iyl, a
+    ld a, h
+    ld iyh, a
+    pop hl
+    ld a, l
+    ld ixl, a
+    ld a, h
+    ld ixh, a
+    exx
+    pop hl
+    exx
+
+++:
+;Switch to correct bank for Title Assets
+    ld a, (currentBank)
+    ld ($FFFF), a
 EndVBlank:
 ;Check if we have completed the previous frame
     ld hl, frameFinish
@@ -114,6 +175,8 @@ EndVBlank:
     ld (hl), $00
 ;Restore registers
 ++:
+    pop de
+    pop bc
     pop hl
     pop af
     ei

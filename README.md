@@ -3,7 +3,12 @@
 ![](https://github.com/Bofner/Space-Tonbow/blob/main/images/tite.gif)
 
 Soar through outerspace as the giant mechanical dragonfly, Tonbow, taking out enemy orbs swarming the stars
-in this arcade-style Sega Master System game!
+in this arcade-style Sega Master System game! 
+
+This repository contains the source code for Space Tonbow. 
+You're welcome to compile it yourself, but if you want a direct download of the ROM, that can be found for free
+on its itch.io page: https://bofner.itch.io/space-tonbow
+
 
 For me this feels like a big step up over Triangle Puzzle. I spent a lot of time working on this one,
 and yet at the same time, things came together rather quickly when I focused on the project. So what
@@ -65,6 +70,10 @@ This repository includes all source code and assets for this project. All code, 
 
 -[Deflemask](https://www.deflemask.com/) by Leonard Demartino
 
+-[Furnace Tracker](https://tildearrow.org/furnace/) by Tile Arrow
+
+-Moon Blaster 1.4 by Moon Soft
+
 -[PSGTool](https://www.smspower.org/forums/16925-PSGToolAVGMToPSGConvertor) by Calindro
  
 ### Programming and Assembly:
@@ -73,7 +82,9 @@ This repository includes all source code and assets for this project. All code, 
 
 -[WLA DX Assembler](https://github.com/vhelin/wla-dx) by Ville Helin
 
--[PSGLib](https://github.com/sverx/PSGlib) by sverx 
+-[PSGLib](https://github.com/sverx/PSGlib) by Sverx 
+
+-[MBMPlayer](https://github.com/HerrSchatten/MBMPlay-SMS) by HerrSchatten
  
 Thanks to everyone who made these wonderful tools!
 
@@ -83,6 +94,33 @@ to continue working on this project!
 __________________________________________________________________________________________________
  
 ## Updates:
+
+#### v1.0: Official release! 07/30/2024
+It's finally here! After about a year of development and procrastination, Space Tonbow is finally here! It's biggest features being:
+
+-TATE support
+
+-FM Sound Unit Support
+
+-SRAM High Score save feature
+
+Again, if you want to download the ROM, check out the itch.io page: https://bofner.itch.io/space-tonbow
+
+__________________________________________________________________________________________________
+
+Here's everything I've added/fixed since the previous update: 
+
+-Added Splash screen music! Added FM music and sound effects!
+
+-Added a high score mechanic using SRAM to save your high scores. 
+
+-Fixed a bug where if you die on the bottom of screen, no parts go flying.
+
+-Fixed a glitch where the BG star scrolling speed would get messed up. 
+
+-Fixed a glitch where SFX would cut out the music in PSG mode. 
+
+-Enemies no longer spawn on top of each other.
 
 #### v0.9.6.1: 07/16/2024
 Fixed a bug that was causing a jump to random memory, leading to odd glitches and the game not 

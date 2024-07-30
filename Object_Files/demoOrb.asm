@@ -309,7 +309,7 @@ SpawnDemoOrb:
     call EnemyList@CheckAvailability
     pop bc
     ex de, hl                           ;ld hl, demoOrbStruct.hitBox.width
-;Set up DemoOrb
+@SetUpDemoOrb:
     call RandomNumberGenerator
     ld ixl, a                           ;Save for later
     and $0F                             ;Limit our number so that it fits on screen (Bytes reversed)
@@ -327,8 +327,17 @@ SpawnDemoOrb:
     rrca
     rrca                                ;And swap around
 
-
 @SetYPos:
+;Check if we spawned here last time
+    ld de, demoOrbSpawnPos
+    ld b, a
+    ld a, (de)
+    cp b
+;If we did, then get new RNG
+    jr z, @SetUpDemoOrb
+;Else save our current spawning location
+    ld a, b
+    ld (de), a
     push bc
         ld b, a
         xor a

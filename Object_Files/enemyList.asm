@@ -245,9 +245,27 @@ EnemyList:
     ;Work in the Audio Bank
         ld a, Audio
         ld ($FFFF), a
+    ;Check for FM
+        ld a, (playFM)
+        cp $01
+        jr z, +
 	    ld hl, ExplosionSFX
 	    ld c, SFX_CHANNEL3		;Channels 3
 	    call PSGSFXPlay
+        jr ++
+    ;Play FM SFX
++:
+	    ld hl, MBMSFXBank
+	    ld (hl), Audio
+	    ld hl, MBMSFXStart
+        ld de, ExplosionSFXFM
+	    ld a, e
+        ld (hl), a
+        ld a, d
+        inc hl
+        ld (hl), a
+        call MBMSFXPlay 
+++:
     ;Switch to correct bank for Title Assets
         ld a, DemoLevelBank
         ld ($FFFF), a

@@ -1,4 +1,9 @@
+;================================================================
+; SteelFinger Studios
+;================================================================
 SteelFingerStudios:
+
+    di
 ;==============================================================
 ; Scene beginning
 ;==============================================================
@@ -11,12 +16,14 @@ SteelFingerStudios:
 ;Switch to correct bank for SFS ASsets
     ld a, SFSBank
     ld ($FFFF), a
+    ld hl, currentBank
+    ld (hl), a
 
 ;==============================================================
 ; Memory (Structures, Variables & Constants) 
 ;==============================================================
 
-.enum $DFFF - $30 export
+.enum $DFFF - $FF export
     topShimmer instanceof spriteStruct      ;Shimmer effect
     botShimmer instanceof spriteStruct      ;Shimmer effect
 .ende
@@ -260,6 +267,20 @@ SteelFingerStudios:
 ;Fade screen in
     call FadeIn
 
+;Work in the Audio Bank
+    ld a, Audio
+    ld ($FFFF), a
+;Turn FM off
+    ld hl, onFM
+    ld (hl), $00
+;And load song
+    ld hl, SteelFingerStudiosJingle
+    call PSGPlayNoRepeat
+;Switch to correct bank for SFS ASsets
+    ld a, SFSBank
+    ld ($FFFF), a
+
+
 SFSLoop:       ;This is the loop
     halt
 ;Prevent sprite scrambling if pause button is hit
@@ -292,7 +313,7 @@ SFSLoop:       ;This is the loop
     inc a                       ; }
     ld l, a                     ;/
     ld a, (hl)
-    add a, $03
+    add a, $02
     ld (hl), a
     ld hl, botShimmer.xPos
 ;Adjust for TATE
@@ -302,7 +323,7 @@ SFSLoop:       ;This is the loop
     inc a                       ; }
     ld l, a                     ;/
     ld a, (hl)
-    add a, $03
+    add a, $02
     ld (hl), a
 
 ;Check if shimmer has wrapped around the screen
@@ -314,23 +335,33 @@ SFSLoop:       ;This is the loop
     inc a                       ; }
     ld l, a                     ;/
     ld a, (hl)
-    cp $00
+    cp $01
     jr nz, +
 ;Complete scene
     ld hl, sceneComplete
-    ld (hl), $01
+    inc (hl)
 
 
 ;Shimmer hasn't wrapped yet, so scene isn't over   
 +:
 ;Check if scene has finished
     ld a, (sceneComplete)
-    cp $00
-    jp z, +
+    cp $03
+    jp c, +
     ld b, $2A
 -:
+    push bc
     halt
+    pop bc
     djnz -
+;Work in the Audio Bank
+    ld a, Audio
+    ld ($FFFF), a
+;Stop Music 
+    call PSGStop
+;Switch to correct bank for SFS Asets
+    ld a, SFSBank
+    ld ($FFFF), a
 
     call FadeToBlack
     call BlankScreen
@@ -343,7 +374,13 @@ SFSLoop:       ;This is the loop
 
 ;Scene isn't finished, so loop
 +:  
-    
+;Check if we need to waste time for music to  finish
+    ld hl, sceneComplete
+    ld a, (hl)
+    cp $01
+    jr c, +
+    inc (hl)
++:  
     jp SFSLoop     ;Keep us on the title screen
 
 

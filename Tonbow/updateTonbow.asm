@@ -29,7 +29,7 @@ UpdateTonbow:
     call TonbowJoypad1Check
 ReturnFromDash:
     call UpdateTonbowPosition
-    call UpdateTonbowGraphics
+    ;call UpdateTonbowGraphics
 +:
  
 +:
@@ -43,7 +43,7 @@ ReturnFromDash:
 ;And the parts Y
     ld hl, tonbowPart0.yPos
     ld a, (tonbow.yPos)
-    add a, 8
+    add a, 9
     ld (hl), a
     ld hl, tonbowPart1.yPos
     ld (hl), a
@@ -91,8 +91,8 @@ UpdateTonbowParts:
     inc (hl)
     dec hl                      ;ld hl, tonbowPart0.yPos
     ld a, (hl)
-    cp VerticalBounds
-    jr nc, +
+    cp $04
+    jr c, +
     dec (hl)
 ;Still need to update next frame
     ld hl, tonbowPart0.flag
@@ -119,8 +119,8 @@ UpdateTonbowParts:
     dec hl                      ;ld hl, tonbowPart1.yPos
     ld a, (hl)
     add a, $10
-    cp VerticalBounds 
-    jr nc, +
+    cp $03 
+    jr c, +
     dec (hl)
     dec (hl)
 ;Still need to update next frame
@@ -147,8 +147,7 @@ UpdateTonbowParts:
     dec (hl)
     dec hl                      ;ld hl, tonbowPart2.yPos
     ld a, (hl)
-    sub a, $10
-    cp DownBounds
+    cp $BF
     jr nc, +
     inc (hl)
     inc (hl)
@@ -181,8 +180,7 @@ UpdateTonbowParts:
     inc (hl)
     dec hl                      ;ld hl, tonbowPart0.yPos
     ld a, (hl)
-    sub a, $10
-    cp VerticalBounds
+    cp $BF
     jr nc, +
     inc (hl)
     inc (hl)
@@ -212,9 +210,8 @@ UpdateTonbowParts:
     inc (hl)
     dec hl                      ;ld hl, tonbowPart1.yPos
     ld a, (hl)
-    add a, $10
-    cp VerticalBounds 
-    jr nc, +
+    cp $03 
+    jr c, +
     dec (hl)
 ;Still need to update next frame
     ld hl, tonbowPart1.flag
@@ -243,9 +240,9 @@ UpdateTonbowParts:
     dec (hl)
     dec hl                      ;ld hl, tonbowPart2.yPos
     ld a, (hl)
-    add a, $10
-    cp VerticalBounds
-    jr nc, +
+    add a, $08
+    cp $03
+    jr c, +
     dec (hl)
 ;Still need to update next frame
     ld hl, tonbowPart2.flag
@@ -807,24 +804,79 @@ TonbowDead:
 
     ld hl, tonbow.hurtBox.width
     ld (hl), 0
+;Check if we have a high score
+    ld a, (highScoreSMS + 1)
+    ld c, a                 ;C has our previous high score
+    ld a, (score + 1)
+    cp c
+    jr c, @Audio
+    ld a, (highScoreSMS)
+    ld c, a                 ;C has our previous high score
+    ld a, (score)
+    cp c
+    jr c, @Audio
+;Set High Score
+    ld hl, highScoreSMS
+    ld (hl), a
+    ld c, a                 ;Save score in C
+    ;RAM Select Register
+    ld a, %00001000
+    ld (sramSwitch), a
+    ld hl, highScoreOffset
+    ld a, c                 ;Put score back in A
+    ld (hl), a
+    ld a, %00000000
+    ld (sramSwitch), a
+    ld hl, highScoreFlag
+    ld (hl), $01
+
+@Audio:
+;If we got a high score, then don't run GAME OVER code yet
+    ld a, (highScoreFlag)
+    bit 0, a
+    ;ret nz
 
 ;Work in the Audio Bank
     ld a, Audio
     ld ($FFFF), a
+    ld hl, currentBank
+    ld (hl), Audio
+;Check for FM
+    ld a, (playFM)
+    cp $01
+    jr z, +
+;PSG の秋が始まる
     call PSGStop
+    call PSGSFXStop
     ld hl, AkiGaHajimaruPSG
     call PSGPlayNoRepeat
+    jr ++
+;FM の秋が始まる
++:
+;If we have it, we want to use FM
+    ld hl, onFM
+    ld (hl), $01
+;So turn it on
+    ;ld a, $01
+    ;out ($f2),a
+;Cut current song and SFX
+    call MBMStop
+    call MBMSFXStop
+;Load Aki Ga Hajimaru
+    ld hl, MBMStart
+    ld de, AkiGaHajimaruFM
+    ld a, e
+    ld (hl), a
+    ld a, d
+    inc hl
+    ld (hl), a
+    call MBMPlayNoRepeat
 ;Switch to correct bank for Title Assets
+++:
     ld a, DemoLevelBank
     ld ($FFFF), a
-
-
-;Reduce the number of enemies on screen to accomodate for the GAME OVER message
-    ;ld hl, enemyList.enemyCountMax
-    ;ld (hl), $06
-
-    ;ld hl, projectileList.enemyCountMax
-    ;ld (hl), $06
+    ld hl, currentBank
+    ld (hl), DemoLevelBank
 
     ret
 

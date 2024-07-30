@@ -5,6 +5,8 @@
 .define TATE_SCORE_VRAM     $3240
 .define TATE_SCORE_CC       $92
 .define TATE_SCORE_ZERO     scoreTateTiles + $40
+.define NEW_HIGH_SCORE      $B6
+.define NEW_HIGH_SCORE_VRAM  $36C0
 
 ;Adds 1 to the score, which is represented in Decimal
 ;Parameters: None
@@ -237,7 +239,9 @@ InitScoreYoko:
     inc hl                              ;ld hl, scoreOnes.cc
     ld (hl), ZERO_VRAM - 2
 
-ret
+    jr InitYokoHighScore
+;-----------------------------------------------------------------------
+
 
 InitScoreTate:
 ;ONES
@@ -256,5 +260,52 @@ InitScoreTate:
     ld (hl), $EC;244
     inc hl                              ;ld hl, scoreOnes.cc
     ld (hl), TATE_SCORE_CC
+
+    jr InitTateHighScore
+
+
+InitYokoHighScore:
+;New High Score! Yoko
+    ld hl, newHighScore.sprNum
+    inc hl                              ;ld hl, spriteSize
+    ld (hl), $10                        ;8x16
+    inc hl                              ;ld hl, newHighScore.width
+    ;Sprite is 1x2 for 8x8
+    ld (hl), $04                        
+    inc hl                              ;ld hl, newHighScore.height
+    ld (hl), $01                        
+    inc hl                              ;ld hl, newHighScore.yPos
+    ld a, (titleSprite.yPos)
+    add a, $10
+    ld (hl), a
+    inc hl                              ;ld hl, newHighScore.xPos
+    ld a, (titleSprite.xPos)
+    add a, $03
+    ld (hl), a
+    inc hl                              ;ld hl, newHighScore.cc
+    ld (hl), NEW_HIGH_SCORE
+
+    ret
+
+InitTateHighScore:
+;New High Score! Tate
+    ld hl, newHighScore.sprNum
+    inc hl                              ;ld hl, spriteSize
+    ld (hl), $10                        ;8x16
+    inc hl                              ;ld hl, newHighScore.width
+    ;Sprite is 2x2 for 8x8
+    ld (hl), $02                        
+    inc hl                              ;ld hl, newHighScore.height
+    ld (hl), $02                        
+    inc hl                              ;ld hl, newHighScore.yPos
+    ld a, (titleSprite.yPos)
+    add a, $04
+    ld (hl), a
+    inc hl                              ;ld hl, newHighScore.xPos
+    ld a, (titleSprite.xPos)
+    sub a, $18
+    ld (hl), a
+    inc hl                              ;ld hl, newHighScore.cc
+    ld (hl), NEW_HIGH_SCORE
 
     ret

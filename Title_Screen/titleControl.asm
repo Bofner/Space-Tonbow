@@ -44,8 +44,6 @@ ButtonOne_TitleScreen:
 	cp $01
 	jr z, +					;If not, then move to options screen
 
-
-
 	ld hl, sceneComplete
 	ld (hl), $01
 	ret
@@ -55,7 +53,24 @@ ButtonOne_TitleScreen:
     ld de, pauseSceneID
     ld (de), a
     ld (hl), PAUSE_SCREEN
+;Cut to black
     call FadeToBlack
+;Cut the music
+    ld a, Audio
+    ld ($FFFF), a
+;Check for FM
+    ld a, (playFM)
+    cp $01
+    jr z, +
+    call PSGStop
+    jr ++
++:
+    call MBMStop
+++:
+;Switch to correct bank for Title Assets
+    ld a, (currentBank)
+    ld ($FFFF), a   
+
 ;Switch to correct bank for Title Assets
     ld a, DemoLevelBank
     ld ($FFFF), a
@@ -103,10 +118,40 @@ ButtonTwo_TitleScreen:
     bit 0, a
     jr nz, +
     ld (hl), $01
+;Cut the music
+    ld a, Audio
+    ld ($FFFF), a
+;Check for FM
+    ld a, (playFM)
+    cp $01
+    jr z, +
+    call PSGStop
+    jr ++
++:
+    call MBMStop
+++:
+;Switch to correct bank for Title Assets
+    ld a, (currentBank)
+    ld ($FFFF), a   
     call FadeToBlack
     jp TitleScreen
 +:
     ld (hl), $00
+;Cut the music
+    ld a, Audio
+    ld ($FFFF), a
+;Check for FM
+    ld a, (playFM)
+    cp $01
+    jr z, +
+    call PSGStop
+    jr ++
++:
+    call MBMStop
+++:
+;Switch to correct bank for Title Assets
+    ld a, (currentBank)
+    ld ($FFFF), a   
     call FadeToBlack
     jp TitleScreen
 

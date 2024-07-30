@@ -182,6 +182,11 @@ GameOverCursor:
     .include "..\\assets\\tiles\\sprites\\gameOver\\cursorYoko.inc"
 GameOverCursorEnd:
 
+NewHighScoreYoko:
+    .include "..\\assets\\tiles\\sprites\\score\\highScoreYoko.inc"
+
+NewHighScoreYokoEnd:
+
 GameOverTate:
     .include "..\\assets\\tiles\\sprites\\gameOver\\gameOverTate.inc"
 GameOverTateEnd:
@@ -197,6 +202,11 @@ GameOverTitleTateEnd:
 GameOverCursorTate:
     .include "..\\assets\\tiles\\sprites\\gameOver\\cursorTate.inc"
 GameOverCursorTateEnd:
+
+NewHighScoreTate:
+    .include "..\\assets\\tiles\\sprites\\score\\highScoreTate.inc"
+
+NewHighScoreTateEnd:
 
 .bank TonbowTilesBank
 .org $0000
@@ -346,6 +356,13 @@ TitleScreenTilesEnd:
 TitleScreenStartTiles:
     .include "..\\assets\\tiles\\backgrounds\\titleScreenStart.inc"
 TitleScreenStartTilesEnd:
+
+HighYokoTiles:
+    .include "..\\assets\\tiles\\backgrounds\\titleHighYoko.inc"
+HighYokoTilesEnd:
+HighScoreYokoFont:
+    .include "..\\assets\\tiles\\backgrounds\\highScoreFontYoko.inc"
+HighScoreYokoFontEnd:
 ;----------------
 ; BG Map
 ;----------------
@@ -367,6 +384,11 @@ OptionsTopMapEnd:
 OptionsBotMap:
 	.dw $00FB $00FC $00F6 $00FD $00FB $00FE $00F5
 OptionsBotMapEnd:
+
+HighYokoMap:
+    .include "..\\assets\\maps\\titleHighYoko.inc"
+HighYokoMapEnd:
+
 ;========================================================
 ; Sprites
 ;========================================================
@@ -407,6 +429,14 @@ TitleScreenTateTilesEnd:
 TitleScreenTateStartTiles:
 .include "..\\assets\\tiles\\backgrounds\\titleScreenTateStart.inc"
 TitleScreenTateStartTilesEnd:
+
+HighTateTiles:
+    .include "..\\assets\\tiles\\backgrounds\\titleHighTate.inc"
+HighTateTilesEnd:
+HighScoreTateFont:
+    .include "..\\assets\\tiles\\backgrounds\\highScoreFontTate.inc"
+HighScoreTateFontEnd:
+    .include "..\\assets\\tiles\\backgrounds\\highScoreFontTate.inc"
 ;----------------
 ; Start Options
 ;----------------
@@ -454,11 +484,33 @@ CursorTateTilesEnd:
 .bank Audio
 .org $0000
 .include "..\\Audio\\PSGlib.asm"
+SteelFingerStudiosJingle:
+    .incbin "..\\Audio\\music\\sfs_jingle.bin"
 SpaceWindPSG:
     .incbin "..\\Audio\\music\\space_wind.bin"
 AkiGaHajimaruPSG:
     .incbin "..\\Audio\\music\\aki_ga_hajimaru.bin"
 DemoFireSFX:
     .incbin "..\\Audio\\sfx\\demo_fire.bin"
+
 ExplosionSFX:
     .incbin "..\\Audio\\sfx\\explosion.bin"
+
+;---------------------------------------------------------------
+.include "..\\Audio\\MBMPlay.asm"
+.include "..\\Audio\\MBMSFXPlay.asm"
+
+AkiGaHajimaruFM:
+    .incbin "..\\Audio\\music\\aki_ga_fm.bin"
+
+SpaceWindFM:
+    .incbin "..\\Audio\\music\\space_wind_fm.bin"
+
+DemoFireSFXFM:
+    .incbin "..\\Audio\\sfx\\demo_fire_FM.bin"    
+
+ExplosionSFXFM:
+    .incbin "..\\Audio\\sfx\\alt_expl_FM.bin"  
+
+;---------------------------------------------------------------
+

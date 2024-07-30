@@ -367,6 +367,12 @@ CursorState1:
 
 ++:
     call GameOverInit
+    ld a, (tateMode)
+    bit 0, a
+    call z, InitYokoHighScore
+    jr +
+    call InitTateHighScore
++:
     pop hl                      ;This upsets the stack for some reasons
     jp SetUpPause
     ret
