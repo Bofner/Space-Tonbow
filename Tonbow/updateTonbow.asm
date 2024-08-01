@@ -808,15 +808,47 @@ TonbowDead:
     ld a, (highScoreSMS + 1)
     ld c, a                 ;C has our previous high score
     ld a, (score + 1)
+    inc c                   ;>= becomes > only
     cp c
-    jr c, @Audio
+    jr nc, @BigScore
     ld a, (highScoreSMS)
     ld c, a                 ;C has our previous high score
     ld a, (score)
     cp c
     jr c, @Audio
 ;Set High Score
+@BigScore
+;Save 100's Digit
+    ld a, (score + 1)
+    ld hl, highScoreSMS + 1
+    ld (hl), a
+    ld c, a                 ;Store score in C
+;SRAM Select Register
+    ld a, %00001000
+    ld (sramSwitch), a
+    ld hl, highScoreOffset + 1
+    ld a, c                 ;Put score back in A
+    ld (hl), a
+    ld a, %00000000
+    ld (sramSwitch), a
+;Save 10's and 1's Digit
+    ld a, (score)
     ld hl, highScoreSMS
+    ld (hl), a
+    ld c, a                 ;Store score in C
+;SRAM Select Register
+    ld a, %00001000
+    ld (sramSwitch), a
+    ld hl, highScoreOffset
+    ld a, c                 ;Put score back in A
+    ld (hl), a
+    ld a, %00000000
+    ld (sramSwitch), a
+;Let Title know we need to update
+    ld hl, highScoreFlag
+    ld (hl), $01
+/*
+ld hl, highScoreSMS + 1
     ld (hl), a
     ld c, a                 ;Save score in C
     ;RAM Select Register
@@ -829,6 +861,9 @@ TonbowDead:
     ld (sramSwitch), a
     ld hl, highScoreFlag
     ld (hl), $01
+
+*/
+    
 
 @Audio:
 ;If we got a high score, then don't run GAME OVER code yet
