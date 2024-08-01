@@ -58,7 +58,7 @@
 ; SDSC tag and ROM header
 ;==============================================================
 
-.sdsctag 1.0, "SPACE TONBOW", "A TATE/YOKO Experiment","Bofner"
+.sdsctag 1.1, "SPACE TONBOW", "A TATE/YOKO Experiment","Bofner"
 
 .bank 1 slot 1
 .org $0000

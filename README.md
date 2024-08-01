@@ -95,6 +95,9 @@ ________________________________________________________________________________
  
 ## Updates:
 
+#### v1.1: Update 08/01/2024
+-Fixed a bug with the high score not working properly with scores over 100
+
 #### v1.0: Official release! 07/30/2024
 It's finally here! After about a year of development and procrastination, Space Tonbow is finally here! It's biggest features being:
 
