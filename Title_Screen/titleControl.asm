@@ -219,7 +219,9 @@ ActionButtonJumpTable_TitleScreen:
     jp DPadCheck_TitleScreen
 ;If button one is pressed, check where the cursor is, otherwise check if in options
     jp ButtonOne_TitleScreen               ;Left Button
-    jp ButtonTwo_TitleScreen			   ;Right Button
+    ret                         ;JP is 3 bytes...
+    nop                         ;...RET is only 1...
+    nop                         ;...So 2 NOPs are added for cushion
 
 
 DPadJumpTable_TitleScreen:
